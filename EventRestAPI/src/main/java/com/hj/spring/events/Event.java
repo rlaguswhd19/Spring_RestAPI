@@ -35,6 +35,6 @@ public class Event {
 	private boolean offline;
 	private boolean free;
 	@Enumerated(EnumType.STRING) //숫자값으로 저장되는데 이넘 순서를 바꾸면 데이터가 꼬이기 때문에 string으로 쓴다.
-	private EventStatus eventStatus;
+	private EventStatus eventStatus = EventStatus.DRAFT;
 
 }
