@@ -21,16 +21,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController {
 	
 	@Autowired
-	EventRepository eventRepository;
+	private EventRepository eventRepository;
 	
 	@Autowired
-	ModelMapper modelMapper;
+	private ModelMapper modelMapper;
+	
+	@Autowired
+	private EventValidator eventValidator;
 	
 	@PostMapping("/")
 	public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
 		if(errors.hasErrors()) {
 			return ResponseEntity.badRequest().build();
 		}
+		
+		eventValidator.validate(eventDto, errors);
+		if(errors.hasErrors()) {
+			return ResponseEntity.badRequest().build();
+		}
+		
 		Event event = modelMapper.map(eventDto, Event.class);
 		Event newEvent = this.eventRepository.save(event);
 		URI createUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
