@@ -64,7 +64,7 @@ public class EventControllerTest {
 	}
 	
 	@Test
-	public void createEvent_Bad_Request() throws Exception {
+	public void createEvent_Bad_Request_Unknown_Input() throws Exception {
 		Event event = Event.builder()
 				.id(100)
 				.name("Srping")
@@ -89,5 +89,17 @@ public class EventControllerTest {
 				) 
 			.andDo(print())
 			.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void createEvent_Bad_Request_Empty_Input() throws Exception {
+		EventDto eventDto = EventDto.builder().build();
+		
+		this.mocMvc.perform(post("/api/events/")
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.accept(MediaTypes.HAL_JSON)
+				.content(objectMapper.writeValueAsString(eventDto))
+				)
+				.andExpect(status().isBadRequest());
 	}
 }
