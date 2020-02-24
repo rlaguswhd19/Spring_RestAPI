@@ -1,9 +1,5 @@
 package com.hj.spring.events;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
-import java.net.URI;
-
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
@@ -21,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController {
 	
 	@Autowired
-	private EventRepository eventRepository;
-	
-	@Autowired
-	private ModelMapper modelMapper;
+	private EventService eventSerivce;
 	
 	@Autowired
 	private EventValidator eventValidator;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 	
 	@PostMapping("/")
 	public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
@@ -36,13 +32,13 @@ public class EventController {
 		}
 		
 		eventValidator.validate(eventDto, errors);
+		
 		if(errors.hasErrors()) {
 			return ResponseEntity.badRequest().body(errors);
 		}
 		
 		Event event = modelMapper.map(eventDto, Event.class);
-		Event newEvent = this.eventRepository.save(event);
-		URI createUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
-		return ResponseEntity.created(createUri).body(newEvent);
+		
+		return eventSerivce.createEvent(event);
 	}
 }

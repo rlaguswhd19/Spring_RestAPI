@@ -36,5 +36,21 @@ public class Event {
 	private boolean free;
 	@Enumerated(EnumType.STRING) //숫자값으로 저장되는데 이넘 순서를 바꾸면 데이터가 꼬이기 때문에 string으로 쓴다.
 	private EventStatus eventStatus = EventStatus.DRAFT;
+	
+	public void update() {
+		// Update Free
+		if(this.basePrice == 0 && this.maxPrice == 0) {
+			this.free = true;
+		} else {
+			this.free = false;
+		}
+		
+		//Update Offline
+		if(this.location == null || this.location.isBlank()) {
+			this.offline = false;
+		}else {
+			this.offline = true;
+		}
+	}
 
 }

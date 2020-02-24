@@ -20,6 +20,8 @@ public class EventValidator {
 			endEventDateTime.isBefore(eventDto.getBeginEnrollmentDateTime())) {
 			
 			errors.rejectValue("endEventDateTime", "Wrong Value", "endEventDateTime is wrong");
+			//reject는 global error이다.
+//			errors.reject(errorCode, defaultMessage);
 		}
 		
 		//TODO BeginEventDateTime
