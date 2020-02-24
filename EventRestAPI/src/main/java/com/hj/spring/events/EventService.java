@@ -4,7 +4,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.net.URI;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +14,6 @@ public class EventService {
 
 	@Autowired
 	private EventRepository eventRepository;
-	
-	@Autowired
-	private ModelMapper modelMapper;
 	
 	public ResponseEntity createEvent(Event event) {
 		
