@@ -1,10 +1,14 @@
 package com.hj.spring.events;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+
+@RunWith(JUnitParamsRunner.class)
 public class EventTest {
 	
 	@Test
@@ -30,40 +34,28 @@ public class EventTest {
 	}
 	
 	@Test
-	public void testFree() {
+	@Parameters(method = "parametersForTestFree")
+	public void testFree(int basePrice, int maxPrice, boolean isFree) {
 		//Given
 		Event event = Event.builder()
-				.basePrice(0)
-				.maxPrice(0)
+				.basePrice(basePrice)
+				.maxPrice(maxPrice)
 				.build();
 		
 		//When
 		event.update();
 		
 		//Then
-		assertThat(event.isFree()).isTrue();
-		
-		//Given
-		event = Event.builder()
-				.basePrice(100)
-				.maxPrice(0)
-				.build();
-		//When
-		event.update();
-				
-		//Then
-		assertThat(event.isFree()).isFalse();
-		
-		//Given
-		event = Event.builder()
-				.basePrice(0)
-				.maxPrice(100)
-				.build();
-		//When
-		event.update();
-				
-		//Then
-		assertThat(event.isFree()).isFalse();
+		assertThat(event.isFree()).isEqualTo(isFree);
+	}
+	
+	private Object[] parametersForTestFree() {
+		return new Object[] {
+				new Object[] {0, 0, true},
+				new Object[] {100, 0 ,false},
+				new Object[] {0, 100 ,false},
+				new Object[] {100, 200 ,false},
+		};
 	}
 	
 	@Test
