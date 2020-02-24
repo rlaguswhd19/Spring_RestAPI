@@ -40,7 +40,7 @@ public class EventControllerTest {
 	public void createEvent() throws Exception {
 		EventDto eventDto = EventDto.builder()
 				.name("Srping")
-				.description("REST API Development with Spring")
+				.description("하윙 API Development with Spring")
 				.beginEnrollmentDateTime(LocalDateTime.of(2020, 02, 19, 14, 19))
 				.closeEnrollmentDateTime(LocalDateTime.of(2020, 02, 20, 14, 19))
 				.beginEventDateTime(LocalDateTime.of(2020, 02, 21, 14, 19))
