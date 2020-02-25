@@ -1,5 +1,9 @@
 package com.hj.spring.events;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -8,29 +12,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.hypermedia.LinksSnippet;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hj.spring.common.RestDocsConfiguration;
 import com.hj.spring.common.TestDescription;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
+@Import(RestDocsConfiguration.class)
 public class EventControllerTest {
 	
 	@Autowired
-	MockMvc mocMvc;
+	MockMvc mockMvc;
 	
 	@Autowired
 	ObjectMapper objectMapper;
@@ -40,7 +51,7 @@ public class EventControllerTest {
 	public void createEvent() throws Exception {
 		EventDto eventDto = EventDto.builder()
 				.name("Srping")
-				.description("하윙 API Development with Spring")
+				.description("Spring API Development with Spring")
 				.beginEnrollmentDateTime(LocalDateTime.of(2020, 02, 19, 14, 19))
 				.closeEnrollmentDateTime(LocalDateTime.of(2020, 02, 20, 14, 19))
 				.beginEventDateTime(LocalDateTime.of(2020, 02, 21, 14, 19))
@@ -48,9 +59,9 @@ public class EventControllerTest {
 				.basePrice(100)
 				.maxPrice(200)
 				.limitOfEnrollment(100)
-				.location("대전 현지의 러브하우스")
+				.location("Daejeon")
 				.build();
-		mocMvc.perform(post("/api/events/")
+		mockMvc.perform(post("/api/events/")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.accept(MediaTypes.HAL_JSON)
 				.content(objectMapper.writeValueAsString(eventDto))
@@ -66,6 +77,55 @@ public class EventControllerTest {
 			.andExpect(jsonPath("_links.self").exists())
 			.andExpect(jsonPath("_links.query-events").exists())
 			.andExpect(jsonPath("_links.update-event").exists())
+			.andDo(document("create-event", 
+					links(
+							linkWithRel("self").description("link to self"),
+							linkWithRel("query-events").description("link to query-events"),
+							linkWithRel("update-event").description("link to update an existing")
+					),
+					requestHeaders(
+							headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+							headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+					),
+					requestFields(
+							fieldWithPath("name").description("Name of new event"),
+							fieldWithPath("description").description("Description of new event"),
+							fieldWithPath("beginEnrollmentDateTime").description("BeginEnrollmentDateTime of new event"),
+							fieldWithPath("closeEnrollmentDateTime").description("CloseEnrollmentDateTime of new event"),
+							fieldWithPath("beginEventDateTime").description("BeginEventDateTime of new event"),
+							fieldWithPath("endEventDateTime").description("EndEventDateTime of new event"),
+							fieldWithPath("location").description("Location of new event"),
+							fieldWithPath("basePrice").description("BasePrice of new event"),
+							fieldWithPath("maxPrice").description("MaxPrice of new event"),
+							fieldWithPath("limitOfEnrollment").description("LimitOfEnrollment of new event")
+					),
+					responseHeaders(
+							headerWithName(HttpHeaders.LOCATION).description("location header"),
+							headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+					),
+					//requestFields를 사용하면 links가 걸린다. 문서화하지 않았기 때문이다. 하지만 relaxed를 사용하면 모든것을 문서화하지 않아도됀다.
+					//단점은 정확한 문서를 만들지 못한다는거다.
+					
+					responseFields(
+							fieldWithPath("id").description("Id of new event"),
+							fieldWithPath("name").description("Name of new event"),
+							fieldWithPath("description").description("Description of new event"),
+							fieldWithPath("beginEnrollmentDateTime").description("BeginEnrollmentDateTime of new event"),
+							fieldWithPath("closeEnrollmentDateTime").description("CloseEnrollmentDateTime of new event"),
+							fieldWithPath("beginEventDateTime").description("BeginEventDateTime of new event"),
+							fieldWithPath("endEventDateTime").description("EndEventDateTime of new event"),
+							fieldWithPath("location").description("Location of new event"),
+							fieldWithPath("basePrice").description("BasePrice of new event"),
+							fieldWithPath("maxPrice").description("MaxPrice of new event"),
+							fieldWithPath("limitOfEnrollment").description("LimitOfEnrollment of new event"),
+							fieldWithPath("free").description("Free of new event"),
+							fieldWithPath("offline").description("Offline of new event"),
+							fieldWithPath("eventStatus").description("EventStatus of new event"),
+							fieldWithPath("_links.self.href").description("link to self"),
+							fieldWithPath("_links.query-events.href").description("link to query-event list"),
+							fieldWithPath("_links.update-event.href").description("link to update existing event")
+					)
+			))
 			;
 	}
 	
@@ -89,7 +149,7 @@ public class EventControllerTest {
 				.offline(false)
 				.build();
 		
-		mocMvc.perform(post("/api/events/")
+		mockMvc.perform(post("/api/events/")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.accept(MediaTypes.HAL_JSON)
 				.content(objectMapper.writeValueAsString(event))
@@ -103,7 +163,7 @@ public class EventControllerTest {
 	public void createEvent_Bad_Request_Empty_Input() throws Exception {
 		EventDto eventDto = EventDto.builder().build();
 		
-		this.mocMvc.perform(post("/api/events/")
+		mockMvc.perform(post("/api/events/")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.accept(MediaTypes.HAL_JSON)
 				.content(objectMapper.writeValueAsString(eventDto))
@@ -127,7 +187,7 @@ public class EventControllerTest {
 				.location("대전 현지의 러브하우스")
 				.build();
 		
-		this.mocMvc.perform(post("/api/events/")
+		mockMvc.perform(post("/api/events/")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.accept(MediaTypes.HAL_JSON)
 				.content(objectMapper.writeValueAsString(eventDto))
