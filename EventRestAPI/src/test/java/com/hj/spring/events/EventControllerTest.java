@@ -82,6 +82,8 @@ public class EventControllerTest {
 							linkWithRel("self").description("link to self"),
 							linkWithRel("query-events").description("link to query-events"),
 							linkWithRel("update-event").description("link to update an existing")
+//							linkWithRel("profile").description("link to profile")
+							
 					),
 					requestHeaders(
 							headerWithName(HttpHeaders.ACCEPT).description("accept header"),
@@ -105,7 +107,7 @@ public class EventControllerTest {
 					),
 					//requestFields를 사용하면 links가 걸린다. 문서화하지 않았기 때문이다. 하지만 relaxed를 사용하면 모든것을 문서화하지 않아도됀다.
 					//단점은 정확한 문서를 만들지 못한다는거다.
-					
+					//api가 바꼇을때 모든것을 다 하지않으면 api문서화가 제대로 되지 않는다.
 					responseFields(
 							fieldWithPath("id").description("Id of new event"),
 							fieldWithPath("name").description("Name of new event"),
@@ -124,6 +126,8 @@ public class EventControllerTest {
 							fieldWithPath("_links.self.href").description("link to self"),
 							fieldWithPath("_links.query-events.href").description("link to query-event list"),
 							fieldWithPath("_links.update-event.href").description("link to update existing event")
+//							fieldWithPath("_links.profile.href").description("link to profile")
+							
 					)
 			))
 			;
