@@ -4,6 +4,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.util.stream.IntStream;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +45,9 @@ public class EventControllerTest {
 	
 	@Autowired
 	ObjectMapper objectMapper;
+	
+	@Autowired
+	EventRepository eventRepository;
 	
 	@Test
 	@TestDescription("정상적으로 이벤트를 생성하는 테스트")
@@ -205,5 +210,37 @@ public class EventControllerTest {
 				.andExpect(jsonPath("content.[0].code").exists())
 				.andExpect(jsonPath("_links.index").exists())
 				;
+	}
+	
+	@Test
+	@TestDescription("30개의 이벤트를 10개씩 조회하는데 11~20 조회하기")
+	public void queryEvent() throws Exception{
+		// Given
+		IntStream.range(1, 31).forEach(i -> {
+			this.generatedEvent(i);
+		});
+		
+		this.mockMvc.perform(get("/api/events/")
+				.param("page", "1")
+				.param("size", "10")
+				.param("sort", "id,DESC")
+			)
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("page").exists())
+			.andExpect(jsonPath("_embedded.eventList[0]._links.self").exists())
+			.andExpect(jsonPath("_links.self").exists())
+			.andExpect(jsonPath("_links.profile").exists())
+			.andDo(document("query-events"))
+			;
+	}
+
+	private void generatedEvent(int i) {
+		Event event = Event.builder()
+				.name("event"+ i)
+				.description("test event")
+				.build();
+		
+		this.eventRepository.save(event);
 	}
 }
