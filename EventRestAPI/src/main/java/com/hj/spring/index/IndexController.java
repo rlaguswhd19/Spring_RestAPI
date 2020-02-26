@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hj.spring.events.EventController;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 @RestController
 public class IndexController {
 

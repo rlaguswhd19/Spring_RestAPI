@@ -12,33 +12,39 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hj.spring.common.ErrorsResource;
+
 @RestController
 @RequestMapping(value = "/api/events", produces = MediaTypes.HAL_JSON_VALUE)
 public class EventController {
-	
+
 	@Autowired
 	private EventService eventSerivce;
-	
+
 	@Autowired
 	private EventValidator eventValidator;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
-	
+
 	@PostMapping("/")
 	public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
-		if(errors.hasErrors()) {
-			return ResponseEntity.badRequest().body(errors);
+		if (errors.hasErrors()) {
+			return badRequest(errors);
 		}
-		
+
 		eventValidator.validate(eventDto, errors);
-		
-		if(errors.hasErrors()) {
-			return ResponseEntity.badRequest().body(errors);
+
+		if (errors.hasErrors()) {
+			return badRequest(errors);
 		}
-		
+
 		Event event = modelMapper.map(eventDto, Event.class);
-		
+
 		return eventSerivce.createEvent(event);
+	}
+
+	public ResponseEntity badRequest(Errors errors) {
+		return ResponseEntity.badRequest().body(new ErrorsResource(errors));
 	}
 }

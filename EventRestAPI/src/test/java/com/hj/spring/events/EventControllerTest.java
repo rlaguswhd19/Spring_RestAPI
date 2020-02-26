@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hj.spring.common.RestDocsConfiguration;
 import com.hj.spring.common.TestDescription;
 
-
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
@@ -157,7 +156,9 @@ public class EventControllerTest {
 				.content(objectMapper.writeValueAsString(event))
 				) 
 			.andDo(print())
-			.andExpect(status().isBadRequest());
+			.andExpect(status().isBadRequest())
+			;
+			
 	}
 	
 	@Test
@@ -170,7 +171,10 @@ public class EventControllerTest {
 				.accept(MediaTypes.HAL_JSON)
 				.content(objectMapper.writeValueAsString(eventDto))
 				)
-				.andExpect(status().isBadRequest());
+				.andExpect(status().isBadRequest())
+				.andDo(print())
+				.andExpect(jsonPath("_links.index").exists())
+				;
 	}
 	
 	@Test
@@ -196,9 +200,10 @@ public class EventControllerTest {
 				)
 				.andDo(print())
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$[0].objectName").exists())
-				.andExpect(jsonPath("$[0].defaultMessage").exists())
-				.andExpect(jsonPath("$[0].code").exists())
+				.andExpect(jsonPath("content.[0].objectName").exists())
+				.andExpect(jsonPath("content.[0].defaultMessage").exists())
+				.andExpect(jsonPath("content.[0].code").exists())
+				.andExpect(jsonPath("_links.index").exists())
 				;
 	}
 }
