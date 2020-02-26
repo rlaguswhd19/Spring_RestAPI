@@ -22,7 +22,8 @@ public class EventService {
 		event.update();
 		
 		// db
-		Event newEvent = this.eventRepository.save(event);
+		Event newEvent = eventRepository.save(event);
+		
 		WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
 		URI createdUri = selfLinkBuilder.toUri();
 		EventResource eventResource = new EventResource(newEvent);
