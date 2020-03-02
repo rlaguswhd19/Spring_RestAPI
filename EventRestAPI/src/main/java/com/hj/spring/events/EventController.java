@@ -12,6 +12,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,6 +57,20 @@ public class EventController {
 	@GetMapping("/{id}")
 	public ResponseEntity getEvent(@PathVariable Integer id) {
 		return this.eventSerivce.getEvent(id);
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity updateEvent(@PathVariable Integer id, @RequestBody @Valid EventDto eventDto, Errors errors) {
+		if(errors.hasErrors()) {
+			return badRequest(errors);
+		}
+		
+		eventValidator.validate(eventDto, errors);
+		if(errors.hasErrors()) {
+			return badRequest(errors);
+		}
+		
+		return this.eventSerivce.updateEvent(id, eventDto);
 	}
 	
 	public ResponseEntity badRequest(Errors errors) {

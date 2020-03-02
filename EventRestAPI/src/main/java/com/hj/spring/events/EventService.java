@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import java.net.URI;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,9 @@ public class EventService {
 
 	@Autowired
 	private EventRepository eventRepository;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 	
 	public ResponseEntity createEvent(Event event) {
 		
@@ -47,6 +51,7 @@ public class EventService {
 
 	public ResponseEntity getEvent(Integer id) {
 		Optional<Event> optionalEvent = this.eventRepository.findById(id);
+		
 		if(optionalEvent.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
@@ -54,6 +59,25 @@ public class EventService {
 		Event event = optionalEvent.get();
 		EventResource eventResource = new EventResource(event);
 		eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
+		
+		return ResponseEntity.ok(eventResource);
+	}
+
+	public ResponseEntity updateEvent(Integer id, EventDto eventDto) {
+		Optional<Event> optionalEvent = this.eventRepository.findById(id);
+		
+		if(optionalEvent.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		Event event = optionalEvent.get();
+		// 덮어 씌우기
+		this.modelMapper.map(eventDto, event);
+		Event saveEvent = this.eventRepository.save(event);
+		
+		EventResource eventResource = new EventResource(saveEvent);
+		eventResource.add(new Link("/docs/index.html#resources-events-update").withRel("profile"));
+		
 		return ResponseEntity.ok(eventResource);
 	}
 }

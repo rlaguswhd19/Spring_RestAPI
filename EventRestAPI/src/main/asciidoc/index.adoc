@@ -113,12 +113,12 @@ operation::query-events[snippets='http-request,curl-request,http-response,reques
 
 operation::create-event[snippets='request-fields,curl-request,http-request,request-headers,http-response,response-headers,response-fields,links']
 
-[[resources-get-event]]
+[[resources-get-an-event]]
 === 이벤트 조회
 
 `Get` 요청을 사용해서 기존 이벤트 하나를 조회할 수 있다.
 
-operation::get-event[snippets='http-request,curl-request,http-response,request-body,response-body']
+operation::get-an-event[snippets='http-request,curl-request,http-response,request-body,response-body']
 
 [[resources-events-update]]
 === 이벤트 수정
