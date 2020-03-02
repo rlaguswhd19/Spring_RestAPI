@@ -60,5 +60,4 @@ public class AccountServiceTest {
 			assertThat(e.getMessage()).containsSequence(username);
 		}
 	}
-	
 }
