@@ -3,6 +3,7 @@ package com.hj.spring.events;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.net.URI;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,5 +43,17 @@ public class EventService {
 		var pageResource = assembler.toModel(page, e -> new EventResource(e));
 		pageResource.add(new Link("/docs/index.html#resources-events-querys").withRel("profile"));
 		return ResponseEntity.ok(pageResource);
+	}
+
+	public ResponseEntity getEvent(Integer id) {
+		Optional<Event> optionalEvent = this.eventRepository.findById(id);
+		if(optionalEvent.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		Event event = optionalEvent.get();
+		EventResource eventResource = new EventResource(event);
+		eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
+		return ResponseEntity.ok(eventResource);
 	}
 }
