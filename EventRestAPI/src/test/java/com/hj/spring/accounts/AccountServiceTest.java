@@ -1,6 +1,7 @@
 package com.hj.spring.accounts;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Set;
 
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -45,5 +47,17 @@ public class AccountServiceTest {
 		
 		// Then
 		assertThat(userDetails.getPassword()).isEqualTo(password);
+	}
+	
+	@Test
+	public void findByUsernameFail() {
+		String username = "random@naver.com";
+		try {
+			accountService.loadUserByUsername(username);
+			//test 실패
+			fail("supposed to be fail");
+		} catch (UsernameNotFoundException e) {
+			assertThat(e.getMessage()).containsSequence(username);
+		}
 	}
 }
