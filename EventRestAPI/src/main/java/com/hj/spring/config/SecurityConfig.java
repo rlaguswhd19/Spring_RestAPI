@@ -29,7 +29,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public TokenStore tokenStore() {
 		return new InMemoryTokenStore();
 	}
-
+	
+	// Bean으로 노출시킨다.
 	@Bean
 	@Override
 	protected AuthenticationManager authenticationManager() throws Exception {
@@ -57,5 +58,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //			.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).anonymous()
 //		;
 //	}
-	
 }
