@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -48,6 +50,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring().mvcMatchers("/docs/index.html");
 		web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 	}
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http
+			.anonymous()
+				.and()
+			.formLogin()
+				.and()
+			.authorizeRequests()
+				.mvcMatchers(HttpMethod.GET, "/api/**").anonymous()
+				.anyRequest().authenticated()
+			;
+	}
 	
 	
 //  서버가 더 일한다. 시큐리티 안에 들어온 상태
@@ -58,4 +73,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //			.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).anonymous()
 //		;
 //	}
+	
+	
 }
