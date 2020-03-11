@@ -46,6 +46,5 @@ public class AppConfig {
 				accountService.saveAccount(admin);
 			}
 		};
-		
 	}
 }
