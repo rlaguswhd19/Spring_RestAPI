@@ -35,6 +35,7 @@ import com.hj.spring.accounts.Account;
 import com.hj.spring.accounts.AccountRepository;
 import com.hj.spring.accounts.AccountRole;
 import com.hj.spring.accounts.AccountService;
+import com.hj.spring.common.AppProperties;
 import com.hj.spring.common.BaseControllerTest;
 import com.hj.spring.common.TestDescription;
 
@@ -48,6 +49,9 @@ public class EventControllerTest  extends BaseControllerTest{
 	
 	@Autowired
 	AccountRepository accountRepository;
+		
+	@Autowired
+	AppProperties appProperties;
 	
 	@Before
 	public void setUp() {
@@ -378,24 +382,18 @@ public class EventControllerTest  extends BaseControllerTest{
 	
 	private String getAcessToken() throws Exception {
 		// Given
-		String username = "rlaguswhd19@naver.com";
-		String password = "1234";
-				
 		Account khj = Account.builder()
-			.email(username)
-			.password(password)
+			.email(appProperties.getAdminUsername())
+			.password(appProperties.getAdminPassword())
 			.roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
 			.build();
 				
 		this.accountService.saveAccount(khj);
 				
-		String clientId = "myApp";
-		String clientSecret = "pass";
-				
 		ResultActions perform = this.mockMvc.perform(post("/oauth/token")
-			.with(httpBasic(clientId, clientSecret))	
-			.param("username", username)
-			.param("password", password)
+			.with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))	
+			.param("username", appProperties.getAdminUsername())
+			.param("password", appProperties.getAdminPassword())
 			.param("grant_type", "password")
 		)
 			.andDo(print())
