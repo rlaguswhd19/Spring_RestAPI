@@ -251,11 +251,35 @@ public class EventControllerTest  extends BaseControllerTest{
 	}
 	
 	@Test
+	@TestDescription("30개의 이벤트를 10개씩 조회하는데 11~20 조회하기 With Authentication")
+	public void queryEventWithAuthentication() throws Exception{
+		// Given
+		IntStream.range(1, 31).forEach(i -> {
+			this.generatedEvent(i);
+		});
+		
+		this.mockMvc.perform(get("/api/events/")
+				.header(HttpHeaders.AUTHORIZATION, getBearerToken())
+				.param("page", "1")
+				.param("size", "10")
+				.param("sort", "id,DESC")
+			)
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("page").exists())
+			.andExpect(jsonPath("_embedded.eventList[0]._links.self").exists())
+			.andExpect(jsonPath("_links.self").exists())
+			.andExpect(jsonPath("_links.profile").exists())
+			.andExpect(jsonPath("_links.create-event").exists())
+			.andDo(document("query-events"))
+			;
+	}
+	
+	@Test
 	@TestDescription("기존의 이벤트 하나 조회하기")
 	public void getEvent() throws Exception {
 		// Given
 		Event event = this.generatedEvent(100);
-		
 		// When
 		this.mockMvc.perform(get("/api/events/"+event.getId()))
 			.andExpect(status().isOk())
@@ -359,6 +383,7 @@ public class EventControllerTest  extends BaseControllerTest{
 	}
 	
 	private Event generatedEvent(int i) {
+		
 		Event event = Event.builder()
 				.name("Srping")
 				.description("Spring API Development with Spring")

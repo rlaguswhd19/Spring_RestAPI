@@ -12,8 +12,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+
+import com.hj.spring.accounts.Account;
+import com.hj.spring.accounts.AccountAdapter;
 
 @Service
 public class EventService {
@@ -42,14 +50,18 @@ public class EventService {
 		return ResponseEntity.created(createdUri).body(eventResource);
 	}
 
-	public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
+	public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler, Account account) {
 		Page<Event> page = this.eventRepository.findAll(pageable);
 		var pageResource = assembler.toModel(page, e -> new EventResource(e));
 		pageResource.add(new Link("/docs/index.html#resources-events-querys").withRel("profile"));
+		
+ 		if(account != null) {
+			pageResource.add(linkTo(EventController.class).withRel("create-event"));
+		}
 		return ResponseEntity.ok(pageResource);
 	}
 
-	public ResponseEntity getEvent(Integer id) {
+	public ResponseEntity getEvent(Integer id, Account account) {
 		Optional<Event> optionalEvent = this.eventRepository.findById(id);
 		
 		if(optionalEvent.isEmpty()) {
@@ -58,12 +70,16 @@ public class EventService {
 		
 		Event event = optionalEvent.get();
 		EventResource eventResource = new EventResource(event);
+		
+//		if(event.getManager().equals(account)) {
+//			eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update-event"));
+//		}
 		eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
 		
 		return ResponseEntity.ok(eventResource);
 	}
 
-	public ResponseEntity updateEvent(Integer id, EventDto eventDto) {
+	public ResponseEntity updateEvent(Integer id, EventDto eventDto, Account account) {
 		Optional<Event> optionalEvent = this.eventRepository.findById(id);
 		
 		if(optionalEvent.isEmpty()) {
@@ -71,6 +87,11 @@ public class EventService {
 		}
 		
 		Event event = optionalEvent.get();
+		
+		if(!event.getManager().equals(account)) {
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+		}
+		
 		// 덮어 씌우기
 		this.modelMapper.map(eventDto, event);
 		Event saveEvent = this.eventRepository.save(event);
