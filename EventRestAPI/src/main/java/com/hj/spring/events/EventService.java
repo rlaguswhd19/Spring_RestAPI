@@ -71,9 +71,10 @@ public class EventService {
 		Event event = optionalEvent.get();
 		EventResource eventResource = new EventResource(event);
 		
-//		if(event.getManager().equals(account)) {
-//			eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update-event"));
-//		}
+		if(event.getManager().equals(account)) {
+			eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update-event"));
+		}
+		
 		eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
 		
 		return ResponseEntity.ok(eventResource);

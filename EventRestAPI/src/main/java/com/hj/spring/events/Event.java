@@ -9,7 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.hj.spring.accounts.Account;
+import com.hj.spring.accounts.AccountSerializer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +42,8 @@ public class Event {
 	@Enumerated(EnumType.STRING) //숫자값으로 저장되는데 이넘 순서를 바꾸면 데이터가 꼬이기 때문에 string으로 쓴다.
 	private EventStatus eventStatus = EventStatus.DRAFT;
 	@ManyToOne
-	private Account Manager;
+	@JsonSerialize(using = AccountSerializer.class)
+	private Account manager;
 	
 	public void update() {
 		// Update Free
