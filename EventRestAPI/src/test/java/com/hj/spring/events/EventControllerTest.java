@@ -55,8 +55,8 @@ public class EventControllerTest  extends BaseControllerTest{
 	
 	@Before
 	public void setUp() {
-		this.accountRepository.deleteAll();
 		this.eventRepository.deleteAll();
+		this.accountRepository.deleteAll();
 	}
 	
 	@Test
